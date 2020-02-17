@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+"""
+
+Usage: ./momento.py [-b] [-a] [-y] [-t]
+where
+
+
+Author: Matt Post
+"""
+
 
 import sys
 from datetime import datetime
@@ -41,33 +50,39 @@ template_footer = r"""
 default_color = "white"
 
 
-def build_cells(color=default_color, num=52, lastlabel="") -> List[str]:
+def build_cells(color=default_color, num=52, label="", lastlabel="") -> List[str]:
     cells = []
     for weekno in range(1, num + 1):
-        label = lastlabel if weekno == num else ""
-        cells.append(fr"\cellcolor{{{color}}}\footnotesize{{{label}}}")
+        label = lastlabel if weekno == num else label
+        cells.append(fr"\cellcolor{{{color}}}{label}")
     return cells
 
 def main(args):
     current_week = datetime.utcnow().strftime("%U")
 
     table = ""
-    color = "gray!25"
+    color = "white"
     print(template_header, file=args.outfile)
-    print(fr"  \cline{{{args.birth_week}-52}}", file=args.outfile)
-    print(" & ".join(build_cells(color=color, num=52-args.birth_week+1)), file=args.outfile)
+    print(fr"  \cline{{{args.birth_week+1}-52}}", file=args.outfile)
+    print(fr"\multicolumn{{{args.birth_week}}}{{c|}}{{}} & ", file=args.outfile)
+    print(" & ".join(build_cells(color=color, num=52-args.birth_week)), file=args.outfile)
     print(r"\\")
     print(r"\hline")
 
     for year in range(2, args.years):
         if year % 10 == 0:
             color = "gray!25"
-            label = f"{year}"
+            lastlabel = str(year)
         else:
             color = "white"
+            lastlabel = ""
+
+        if year <= args.age:
+            label = "x"
+        else:
             label = ""
 
-        print(" & ".join(build_cells(color=color, lastlabel=label)), r"\\", file=args.outfile)
+        print(" & ".join(build_cells(color=color, label=label, lastlabel=lastlabel)), r"\\", file=args.outfile)
         print(r"  \hline", file=args.outfile)
 
     print(template_footer, file=args.outfile)
