@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 
-Usage: ./momento.py [-b] [-a] [-y] [-t]
+Usage: ./momento.py [-b] [-y] [-t]
 where
 
 
@@ -15,7 +15,7 @@ from typing import List
 
 template_header = r"""\documentclass{article}
 
-\usepackage[letterpaper, total={6.5in, 10in}]{geometry}
+\usepackage[letterpaper, total={6.5in, 9in}]{geometry}
 \usepackage{adjustbox}
 \usepackage{graphicx}
 \usepackage{pdfpages}
@@ -26,7 +26,9 @@ template_header = r"""\documentclass{article}
 
 \begin{document}
 
-\begin{table}[p]
+MOMENTO MORI
+
+\begin{table}[h!]
   \begin{adjustbox}{max width=\textwidth}
   \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}
 """
@@ -40,43 +42,54 @@ template_footer = r"""
 \end{document}
 """
 
-default_color = "white"
+DEFAULT_COLOR = "white"
+DECADE_COLOR = "gray!10"
 
-
-def build_cells(color=default_color, num=52, label_until=52) -> List[str]:
+def build_cells(color=DEFAULT_COLOR, num=52, label_until=52) -> List[str]:
     cells = []
     for weekno in range(1, num + 1):
         label = "x" if weekno <= label_until else ""
         cells.append(fr"\cellcolor{{{color}}}{label}")
     return cells
 
-def main(args):
-    current_week = int(datetime.utcnow().strftime("%U"))
 
+def get_age(birthday, today) -> int:
+    return today.year - birthday.year - 1 + (today.month >= birthday.month and today.day >= birthday.day)
+
+
+def main(args):
+    today = datetime.utcnow()
+    current_week = int(today.strftime("%U"))
+    birthday = datetime.strptime(args.birthday, "%Y-%m-%d")
+    birth_week = int(birthday.strftime("%U"))
+    age = get_age(birthday, today)
+
+    ## Print the header
     table = ""
     color = "white"
     print(template_header, file=args.outfile)
-    print(fr"  \cline{{{args.birth_week+1}-52}}", file=args.outfile)
-    print(fr"\multicolumn{{{args.birth_week}}}{{c|}}{{}} & ", file=args.outfile)
-    print(" & ".join(build_cells(color=color, num=52-args.birth_week, label_until=52)), r" \\", file=args.outfile)
+    print(fr"  \cline{{{birth_week+1}-52}}", file=args.outfile)
+    print(fr"\multicolumn{{{birth_week}}}{{c|}}{{}} & ", file=args.outfile)
+    print(" & ".join(build_cells(color=color, num=52-birth_week, label_until=52)), r" \\", file=args.outfile)
     print(fr"  \cline{{1-52}}", file=args.outfile)
 
+    ## Print the years
     for year in range(2, args.years):
         if year % 10 == 0:
-            color = "gray!25"
+            color = DECADE_COLOR
             finalcol = rf" & {year} \\"
         else:
             color = "white"
             finalcol = r" \\"
 
-        if year <= args.age:
+        if year <= age:
             label = "x"
         else:
             label = ""
 
-        if year > args.age + 1:
+        if year > age + 1:
             label_until = 0
-        elif year == args.age + 1:
+        elif year == age + 1:
             label_until = current_week
         else:
             label_until = 52
@@ -89,10 +102,8 @@ def main(args):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--birth-week", "-b" , type=int, default=1,
-                        help="Week number of birthday (1--52)")
-    parser.add_argument("--age", "-a", type=int, default=0,
-                        help="Your current age")
+    parser.add_argument("--birthday", "-b" , type=str, default="2000-01-01",
+                        help="Birthday in ISO-8601 format (YYYY-MM-DD)")
     parser.add_argument("--years", "-y", type=int, default=78,
                         help="Years you expect to live")
     parser.add_argument("--title", "-t", type=str, default="momento mori",
