@@ -74,7 +74,7 @@ def main(args):
     print(fr"  \cline{{1-52}}", file=args.outfile)
 
     ## Print the years
-    for year in range(2, args.years):
+    for year in range(2, args.years + 1):
         if year % 10 == 0:
             color = DECADE_COLOR
             finalcol = rf" & {year} \\"
