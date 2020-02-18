@@ -6,10 +6,10 @@ If a birthday is provided (in ISO-8601 format), the calendar will be customized 
 
 Usage:
 
-    ./momento.py [-b YYYY-MM-DD] [-y YY] > momento.tex
-    pdflatex momento
+    ./memento.py [-b YYYY-MM-DD] [-y YY] > memento.tex
+    pdflatex memento
 
-which produces a printable A4-size PDF in `momento.pdf`.
+which produces a printable A4-size PDF in `memento.pdf`.
 
 Command-line arguments:
 
@@ -49,14 +49,14 @@ contents={%
 
 \begin{document}
 
-\noindent MOMENTO MORI
+\noindent MEMENTO MORI
 
 \begin{table}[ht!]
   \begin{adjustbox}{max width=\textwidth}
   \setlength\arrayrulewidth{0.75pt}
   \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}
 """
-#   \multicolumn{53}{c}{\LARGE MOMENTO MORI\newline} \\
+#   \multicolumn{53}{c}{\LARGE MEMENTO MORI\newline} \\
 
 template_footer = r"""
   \end{tabular}
