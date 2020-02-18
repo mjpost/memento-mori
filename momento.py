@@ -32,15 +32,28 @@ template_header = r"""\documentclass{article}
 \usepackage{pdfpages}
 \usepackage{booktabs}
 \usepackage{colortbl}
+\usepackage[pages=all]{background}
 
 \pagestyle{empty}
+\renewcommand{\arraystretch}{1.3}
+
+\backgroundsetup{
+scale=0.85,
+color=black,
+opacity=0.05,
+angle=0,
+contents={%
+  \includegraphics[width=\paperwidth,height=\paperheight]{skull.jpg}
+  }%
+}
 
 \begin{document}
 
 \noindent MOMENTO MORI
 
-\begin{table}[h!]
+\begin{table}[ht!]
   \begin{adjustbox}{max width=\textwidth}
+  \setlength\arrayrulewidth{0.75pt}
   \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}
 """
 #   \multicolumn{53}{c}{\LARGE MOMENTO MORI\newline} \\
@@ -53,14 +66,15 @@ template_footer = r"""
 \end{document}
 """
 
-DEFAULT_COLOR = "white"
+DEFAULT_COLOR = "white!10"
 DECADE_COLOR = "gray!10"
 
 def build_cells(color=DEFAULT_COLOR, num=52, label_until=52) -> List[str]:
     cells = []
     for weekno in range(1, num + 1):
-        label = "x" if weekno <= label_until else ""
-        cells.append(fr"\cellcolor{{{color}}}{label}")
+        label = "X" if weekno <= label_until else " "
+#        cells.append(fr"\cellcolor{{{color}}}{label}")
+        cells.append(fr"{label}")
     return cells
 
 
@@ -83,8 +97,7 @@ def main(args):
         header_label_until = 0
 
     ## Print the header
-    table = ""
-    color = "white"
+    color = DEFAULT_COLOR
     print(template_header, file=args.outfile)
     print(fr"  \cline{{{birth_week+1}-52}}", file=args.outfile)
 
@@ -96,13 +109,11 @@ def main(args):
     ## Print the years
     for year in range(2, args.years + 1):
         if year % 10 == 0:
-            color = DECADE_COLOR
             if args.birthday:
                 finalcol = rf" & {birthday.year + year} \\"
             else:
                 finalcol = rf" & {year} \\"
         else:
-            color = "white"
             finalcol = r" \\"
 
         if args.birthday is None or year > age + 1:
