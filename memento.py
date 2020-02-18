@@ -35,7 +35,7 @@ template_header = r"""\documentclass{article}
 \usepackage[pages=all]{background}
 
 \pagestyle{empty}
-\renewcommand{\arraystretch}{1.3}
+\setlength\minrowclearance{6pt}
 
 \backgroundsetup{
 scale=0.85,
@@ -72,7 +72,7 @@ DECADE_COLOR = "gray!10"
 def build_cells(color=DEFAULT_COLOR, num=52, label_until=52) -> List[str]:
     cells = []
     for weekno in range(1, num + 1):
-        label = "X" if weekno <= label_until else " "
+        label = "X" if weekno <= label_until else "\phantom{X}"
 #        cells.append(fr"\cellcolor{{{color}}}{label}")
         cells.append(fr"{label}")
     return cells
@@ -123,9 +123,15 @@ def main(args):
         else:
             label_until = 52
 
-        print("  ", " & ".join(build_cells(color=color, label_until=label_until)), finalcol, file=args.outfile)
-        print(fr"  \cline{{1-52}}", file=args.outfile)
+        # adjustments for last row
+        weeks_to_print = 52
+        if birth_week != 0 and year == args.years:
+            weeks_to_print = birth_week
 
+        print("  ", " & ".join(build_cells(color=color, num=weeks_to_print, label_until=label_until)), finalcol, file=args.outfile)
+        print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
+
+    # close the table
     print(template_footer, file=args.outfile)
 
 if __name__ == "__main__":
