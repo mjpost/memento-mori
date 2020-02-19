@@ -24,37 +24,29 @@ import sys
 from datetime import datetime
 from typing import List
 
-template_header = r"""\documentclass{article}
+template_header = r"""\documentclass{{article}}
 
-\usepackage[a4paper, total={6.5in, 9in}]{geometry}
-\usepackage{adjustbox}
-\usepackage{graphicx}
-\usepackage{pdfpages}
-\usepackage{booktabs}
-\usepackage{colortbl}
-\usepackage[pages=all]{background}
+\usepackage[a4paper, total={{6.5in, 9in}}]{{geometry}}
+\usepackage{{adjustbox}}
+\usepackage{{graphicx}}
+\usepackage{{pdfpages}}
+\usepackage{{booktabs}}
+\usepackage{{colortbl}}
+\usepackage[pages=all]{{background}}
 
-\pagestyle{empty}
-\setlength\minrowclearance{6pt}
+\pagestyle{{empty}}
+\setlength\minrowclearance{{6pt}}
 
-\backgroundsetup{
-scale=0.85,
-color=black,
-opacity=0.05,
-angle=0,
-contents={%
-  \includegraphics[width=\paperwidth,height=\paperheight]{skull.jpg}
-  }%
-}
+{WATERMARK}
 
-\begin{document}
+\begin{{document}}
 
-\noindent MEMENTO MORI
+\noindent {TITLE}
 
-\begin{table}[ht!]
-  \begin{adjustbox}{max width=\textwidth}
-  \setlength\arrayrulewidth{0.75pt}
-  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}
+\begin{{table}}[ht!]
+  \begin{{adjustbox}}{{max width=\textwidth}}
+  \setlength\arrayrulewidth{{0.75pt}}
+  \begin{{tabular}}{{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}}
 """
 #   \multicolumn{53}{c}{\LARGE MEMENTO MORI\newline} \\
 
@@ -98,7 +90,19 @@ def main(args):
 
     ## Print the header
     color = DEFAULT_COLOR
-    print(template_header, file=args.outfile)
+    WATERMARK = ""
+    if args.watermark:
+        WATERMARK = rf"""\backgroundsetup{{
+scale=0.85,
+color=black,
+opacity=0.05,
+angle=0,
+contents={{%
+  \includegraphics[width=\paperwidth,height=\paperheight]{{{args.watermark}}}
+  }}%
+}}"""
+
+    print(template_header.format(WATERMARK=WATERMARK, TITLE=args.title), file=args.outfile)
     print(fr"  \cline{{{birth_week+1}-52}}", file=args.outfile)
 
     if birth_week > 0:
@@ -143,6 +147,16 @@ if __name__ == "__main__":
                         help="Years you expect to live")
     parser.add_argument("--outfile", "-o", type=argparse.FileType("w"), default=sys.stdout,
                         help="File to write to")
+    parser.add_argument("--title", "-t", type=str, default="MEMENTO MORI",
+                        help="Page title")
+    parser.add_argument("--watermark", type=str,
+                        help="File containing watermark image to superimpose")
+    parser.add_argument("--background", "-bg", type=argparse.FileType("r"),
+                        help="File containing background image (52 pixels wide) to incorporate into the table")
     args = parser.parse_args()
+
+    if args.background and args.watermark:
+        print("I can only take exactly one of --watermark and --background|-bg", file=sys.stderr)
+        sys.exit(1)
 
     main(args)
