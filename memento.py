@@ -22,6 +22,7 @@ Author: Matt Post
 import sys
 
 from datetime import datetime
+from PIL import Image
 from typing import List
 
 template_header = r"""\documentclass{{article}}
@@ -61,7 +62,7 @@ template_footer = r"""
 DEFAULT_COLOR = "white!10"
 DECADE_COLOR = "gray!10"
 
-def build_cells(color=DEFAULT_COLOR,
+def build_cells(colors=None,
                 row=1,
                 startcol=1,
                 endcol=52,
@@ -71,8 +72,12 @@ def build_cells(color=DEFAULT_COLOR,
         cells.append(fr"\multicolumn{{{startcol-1}}}{{c|}}{{}}")
     for weekno in range(startcol, endcol + 1):
         label = "X" if weekno <= label_until else "\phantom{X}"
-#        cells.append(fr"\cellcolor{{{color}}}{label}")
-        cells.append(fr"{label}")
+        try:
+            color = colors[weekno-1][row-1] if colors else ""
+        except:
+            # might be beyond length of image
+            color = ""
+        cells.append(f"{color}{label}")
     return cells
 
 
@@ -94,7 +99,17 @@ def main(args):
         age = 0
         header_label_until = 0
 
-    ## Print the header
+    # Figure out background or watermark
+    colors = None
+    if args.background:
+        img = Image.open(args.background)
+        width, height = img.size
+        colors = [["" for y in range(height)] for x in range(width)]
+        for x in range(width):
+            for y in range(height):
+                r, g, b = list(map(lambda x: x / 255, img.getpixel((x, y))))[0:3]
+                colors[x][y] = fr"\cellcolor[rgb]{{{r:.2f},{g:.2f},{b:.2f}}}"
+
     color = DEFAULT_COLOR
     WATERMARK = ""
     if args.watermark:
@@ -112,7 +127,7 @@ contents={{%
     print(template_header.format(WATERMARK=WATERMARK, TITLE=args.title), file=args.outfile)
     print(fr"  \cline{{{birth_week+1}-52}}", file=args.outfile)
 
-    print(" & ".join(build_cells(row=1, startcol=birth_week+1, label_until=header_label_until)), r" \\", file=args.outfile)
+    print(" & ".join(build_cells(row=1, startcol=birth_week+1, label_until=header_label_until, colors=colors)), r" \\", file=args.outfile)
     print(fr"  \cline{{1-52}}", file=args.outfile)
 
     ## Print the years
@@ -137,7 +152,7 @@ contents={{%
         if birth_week != 0 and year == args.years:
             weeks_to_print = birth_week
 
-        print("  ", " & ".join(build_cells(endcol=weeks_to_print, label_until=label_until)), finalcol, file=args.outfile)
+        print("  ", " & ".join(build_cells(row=year, endcol=weeks_to_print, label_until=label_until, colors=colors)), finalcol, file=args.outfile)
         print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
 
     # close the table
@@ -156,7 +171,7 @@ if __name__ == "__main__":
                         help="Page title")
     parser.add_argument("--watermark", type=str,
                         help="File containing watermark image to superimpose")
-    parser.add_argument("--background", "-bg", type=argparse.FileType("r"),
+    parser.add_argument("--background", "-bg", type=str,
                         help="File containing background image (52 pixels wide) to incorporate into the table")
     args = parser.parse_args()
 
