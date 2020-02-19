@@ -17,6 +17,14 @@ You can tell it how many years to generate (default: 78) and have it `x` off the
 
     ./memento.py -y 84 -b 1980-07-04 > page.tex
 
+To use an image as the background, use the `--background` and `--opacity` flags:
+
+    ./memento.py --background examples/skull.jpg --opacity 0.2 -b 1980-07-04 -y 90 > page.tex
+
+Good opacity values are likely 0.1—0.3, though it will of course depend on what image you are using.
+
+If you prefer, you can use `--watermark` instead, which will put an image behind the table (opacity doesn't work with this option).
+
 Compile with `pdflatex`:
 
     pdflatex page.tex

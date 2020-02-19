@@ -13,8 +13,12 @@ which produces a printable A4-size PDF in `memento.pdf`.
 
 Command-line arguments:
 
+- `-t` sets the title displayed in the upper left
 - `-b` is your birthdate in ISO-8601 format
 - `-y` is an expected lifespan (default: 78)
+- `--background FILE` use the specified background image and rasterize to the grid
+- `--opacity FLOAT` is the opacity to use for the background image
+- `--watermark FILE` uses a watermark image behind the table instead
 
 Author: Matt Post
 """
