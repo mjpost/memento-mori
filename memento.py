@@ -74,7 +74,7 @@ def build_cells(colors=None,
                 label_until=52) -> List[str]:
     cells = []
     if startcol != 1:
-        cells.append(fr"\multicolumn{{{startcol-1}}}{{l|}}{{{title}}}")
+        cells.append(fr"\multicolumn{{{startcol-1}}}{{r|}}{{{title}}}")
     for weekno in range(startcol, endcol + 1):
         label = "X" if weekno <= label_until else "\phantom{X}"
         try:
@@ -150,7 +150,7 @@ contents={{%
 
     ## Print the header
     # startcol = birth_week
-    startcol = len(args.title) // 2
+    startcol = max(len(args.title) // 2, birth_week)
     print(template_header.format(WATERMARK=WATERMARK, TITLE=args.title), file=args.outfile)
     print(fr"  \cline{{{startcol}-52}}", file=args.outfile)
 
