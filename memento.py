@@ -104,7 +104,16 @@ def main(args):
     if args.background:
         img = Image.open(args.background)
         width, height = img.size
+
+        # Resize image
+        if width != 52:
+            width = 52
+            height = int(img.size[1] / (img.width / 52))
+            print(f"Resizing image from ({width},{img.size[1]}) to (52,{height})", file=sys.stderr)
+            img = img.resize((52, height))
+
         colors = [["" for y in range(height)] for x in range(width)]
+
         for x in range(width):
             for y in range(height):
                 r, g, b = list(map(lambda x: x / 255, img.getpixel((x, y))))[0:3]
