@@ -61,9 +61,15 @@ template_footer = r"""
 DEFAULT_COLOR = "white!10"
 DECADE_COLOR = "gray!10"
 
-def build_cells(color=DEFAULT_COLOR, num=52, label_until=52) -> List[str]:
+def build_cells(color=DEFAULT_COLOR,
+                row=1,
+                startcol=1,
+                endcol=52,
+                label_until=52) -> List[str]:
     cells = []
-    for weekno in range(1, num + 1):
+    if startcol != 1:
+        cells.append(fr"\multicolumn{{{startcol-1}}}{{c|}}{{}}")
+    for weekno in range(startcol, endcol + 1):
         label = "X" if weekno <= label_until else "\phantom{X}"
 #        cells.append(fr"\cellcolor{{{color}}}{label}")
         cells.append(fr"{label}")
@@ -102,12 +108,11 @@ contents={{%
   }}%
 }}"""
 
+    ## Print the header
     print(template_header.format(WATERMARK=WATERMARK, TITLE=args.title), file=args.outfile)
     print(fr"  \cline{{{birth_week+1}-52}}", file=args.outfile)
 
-    if birth_week > 0:
-        print(fr"  \multicolumn{{{birth_week}}}{{c|}}{{}} & ", file=args.outfile)
-    print(" & ".join(build_cells(color=color, num=52-birth_week, label_until=header_label_until)), r" \\", file=args.outfile)
+    print(" & ".join(build_cells(row=1, startcol=birth_week+1, label_until=header_label_until)), r" \\", file=args.outfile)
     print(fr"  \cline{{1-52}}", file=args.outfile)
 
     ## Print the years
@@ -132,7 +137,7 @@ contents={{%
         if birth_week != 0 and year == args.years:
             weeks_to_print = birth_week
 
-        print("  ", " & ".join(build_cells(color=color, num=weeks_to_print, label_until=label_until)), finalcol, file=args.outfile)
+        print("  ", " & ".join(build_cells(endcol=weeks_to_print, label_until=label_until)), finalcol, file=args.outfile)
         print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
 
     # close the table
