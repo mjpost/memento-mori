@@ -144,7 +144,7 @@ contents={{%
     # startcol = birth_week
     startcol = len(args.title) // 2
     print(template_header.format(WATERMARK=WATERMARK, TITLE=args.title), file=args.outfile)
-    print(fr"  \cline{{{startcol+1}-52}}", file=args.outfile)
+    print(fr"  \cline{{{startcol}-52}}", file=args.outfile)
 
     print(" & ".join(build_cells(row=1, title=args.title, startcol=startcol, label_until=header_label_until, colors=colors)), r" \\", file=args.outfile)
     print(fr"  \cline{{1-52}}", file=args.outfile)
