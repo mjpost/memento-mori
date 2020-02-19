@@ -119,7 +119,7 @@ def main(args):
 
         # Center the image vertically, padding it with the color in the upper right of the original image (assumed to be the background color)
         if height < args.years:
-            new_image = Image.new("RGB", (width, args.years), img.getpixel((0, 51)))
+            new_image = Image.new("RGB", (width, args.years), img.getpixel((51, 0)))
             new_image.paste(img, (0, (args.years - height) // 2))
             img = new_image
             height = args.years
