@@ -42,7 +42,7 @@ template_header = r"""\documentclass{{article}}
 
 \begin{{document}}
 
-\noindent {TITLE}
+% \noindent {TITLE}
 
 \begin{{table}}[ht!]
   \begin{{adjustbox}}{{max width=\textwidth}}
@@ -63,13 +63,14 @@ DEFAULT_COLOR = "white!10"
 DECADE_COLOR = "gray!10"
 
 def build_cells(colors=None,
+                title="",
                 row=1,
                 startcol=1,
                 endcol=52,
                 label_until=52) -> List[str]:
     cells = []
     if startcol != 1:
-        cells.append(fr"\multicolumn{{{startcol-1}}}{{c|}}{{}}")
+        cells.append(fr"\multicolumn{{{startcol-1}}}{{l|}}{{{title}}}")
     for weekno in range(startcol, endcol + 1):
         label = "X" if weekno <= label_until else "\phantom{X}"
         try:
@@ -140,10 +141,12 @@ contents={{%
 }}"""
 
     ## Print the header
+    # startcol = birth_week
+    startcol = len(args.title) // 2
     print(template_header.format(WATERMARK=WATERMARK, TITLE=args.title), file=args.outfile)
-    print(fr"  \cline{{{birth_week+1}-52}}", file=args.outfile)
+    print(fr"  \cline{{{startcol+1}-52}}", file=args.outfile)
 
-    print(" & ".join(build_cells(row=1, startcol=birth_week+1, label_until=header_label_until, colors=colors)), r" \\", file=args.outfile)
+    print(" & ".join(build_cells(row=1, title=args.title, startcol=startcol, label_until=header_label_until, colors=colors)), r" \\", file=args.outfile)
     print(fr"  \cline{{1-52}}", file=args.outfile)
 
     ## Print the years
