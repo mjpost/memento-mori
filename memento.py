@@ -46,7 +46,7 @@ template_header = r"""\documentclass{{article}}
 
 \begin{{table}}[ht!]
   \begin{{adjustbox}}{{max width=\textwidth}}
-  \setlength\arrayrulewidth{{0.75pt}}
+%  \setlength\arrayrulewidth{{0.75pt}}
   \begin{{tabular}}{{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}}
 """
 #   \multicolumn{53}{c}{\LARGE MEMENTO MORI\newline} \\
@@ -108,10 +108,10 @@ def main(args):
 
         # Resize image
         if width != 52:
-            width = 52
             height = int(img.size[1] / (img.width / 52))
             print(f"Resizing image from ({width},{img.size[1]}) to (52,{height})", file=sys.stderr)
-            img = img.resize((52, height))
+            width = 52
+            img = img.resize((width, height))
 
         # Center the image vertically, padding it with the color in the upper right of the original image (assumed to be the background color)
         if height < args.years:
@@ -124,7 +124,7 @@ def main(args):
 
         for x in range(width):
             for y in range(height):
-                r, g, b = list(map(lambda x: x / 255, img.getpixel((x, y))))[0:3]
+                r, g, b = list(map(lambda x: ((255 - ((255 - x) * args.opacity)) / 255), img.getpixel((x, y))))[0:3]
                 colors[x][y] = fr"\cellcolor[rgb]{{{r:.2f},{g:.2f},{b:.2f}}}"
 
     color = DEFAULT_COLOR
@@ -192,6 +192,8 @@ if __name__ == "__main__":
                         help="File containing watermark image to superimpose")
     parser.add_argument("--background", "-bg", type=str,
                         help="File containing background image (52 pixels wide) to incorporate into the table")
+    parser.add_argument("--opacity", type=float, default=1.0,
+                        help="Opacity of background image")
     args = parser.parse_args()
 
     if args.background and args.watermark:
