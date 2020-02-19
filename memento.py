@@ -79,6 +79,10 @@ def build_cells(colors=None,
             # might be beyond length of image
             color = ""
         cells.append(f"{color}{label}")
+
+    if endcol != 52:
+        cells.append(fr"\multicolumn{{{52-endcol}}}{{|l}}{{}}")
+
     return cells
 
 
@@ -176,6 +180,7 @@ contents={{%
 
     # close the table
     print(template_footer, file=args.outfile)
+
 
 if __name__ == "__main__":
     import argparse
