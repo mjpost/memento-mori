@@ -41,6 +41,7 @@ template_header = r"""\documentclass{{article}}
 
 \pagestyle{{empty}}
 \setlength\minrowclearance{{6pt}}
+\setlength{{\arrayrulewidth}}{{1.2pt}}
 
 {WATERMARK}
 
@@ -50,7 +51,6 @@ template_header = r"""\documentclass{{article}}
 
 \begin{{table}}[ht!]
   \begin{{adjustbox}}{{max width=\textwidth}}
-%  \setlength\arrayrulewidth{{0.75pt}}
   \begin{{tabular}}{{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}}
 """
 #   \multicolumn{53}{c}{\LARGE MEMENTO MORI\newline} \\
@@ -76,7 +76,7 @@ def build_cells(colors=None,
     if startcol != 1:
         cells.append(fr"\multicolumn{{{startcol-1}}}{{r|}}{{{title}}}")
     for weekno in range(startcol, endcol + 1):
-        label = "X" if weekno <= label_until else "\phantom{X}"
+        label = r"\textbf{X}" if weekno <= label_until else r"\phantom{\textbf{X}}"
         try:
             color = colors[weekno-1][row-1] if colors else ""
         except:
