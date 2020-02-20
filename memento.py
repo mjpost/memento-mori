@@ -41,7 +41,7 @@ template_header = r"""\documentclass{{article}}
 
 \pagestyle{{empty}}
 \setlength\minrowclearance{{6pt}}
-\setlength{{\arrayrulewidth}}{{1.2pt}}
+\setlength{{\arrayrulewidth}}{{0.75pt}}
 
 {WATERMARK}
 
@@ -71,6 +71,7 @@ def build_cells(colors=None,
                 row=1,
                 startcol=1,
                 endcol=52,
+                endtitle="",
                 label_until=52) -> List[str]:
     cells = []
     if startcol != 1:
@@ -161,11 +162,11 @@ contents={{%
     for year in range(2, args.years + 1):
         if year % 10 == 0:
             if args.birthday:
-                finalcol = rf" & {birthday.year + year} \\"
+                endtitle = str(birthday.year + year)
             else:
-                finalcol = rf" & {year} \\"
+                endtitle = str(year)
         else:
-            finalcol = r" \\"
+            endtitle = ""
 
         if args.birthday is None or year > age + 1:
             label_until = 0
@@ -179,8 +180,9 @@ contents={{%
         if birth_week != 0 and year == args.years:
             weeks_to_print = birth_week
 
-        print("  ", " & ".join(build_cells(row=year, endcol=weeks_to_print, label_until=label_until, colors=colors)), finalcol, file=args.outfile)
-        print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
+        print("  ", " & ".join(build_cells(row=year, endcol=weeks_to_print, label_until=label_until, colors=colors, endtitle=endtitle)), r" \\", file=args.outfile)
+#        print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
+        print(fr"  \hline", file=args.outfile)
 
     # close the table
     print(template_footer, file=args.outfile)
