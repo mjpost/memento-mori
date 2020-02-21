@@ -6,7 +6,7 @@ If a birthday is provided (in ISO-8601 format), the calendar will be customized 
 
 Usage:
 
-    ./memento.py [-b YYYY-MM-DD] [-y YY] > memento.tex
+    ./memento.py [-b YYYY-MM-DD] [-y YY] [--background IMG] [--opacity FLOAT] > memento.tex
     pdflatex memento
 
 which produces a printable A4-size PDF in `memento.pdf`.
