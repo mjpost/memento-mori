@@ -47,13 +47,10 @@ template_header = r"""\documentclass{{article}}
 
 \begin{{document}}
 
-% \noindent {TITLE}
-
 \begin{{table}}[ht!]
   \begin{{adjustbox}}{{max width=\textwidth}}
-  \begin{{tabular}}{{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}}
+  \begin{{tabular}}{{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}}
 """
-#   \multicolumn{53}{c}{\LARGE MEMENTO MORI\newline} \\
 
 template_footer = r"""
   \end{tabular}
@@ -74,9 +71,15 @@ def build_cells(colors=None,
                 endtitle="",
                 label_until=52) -> List[str]:
     cells = []
+    lastcols = []
+    lastlen = 0
+    if endtitle != "":
+        lastlen = len(endtitle)
+        lastcols = list(map(lambda x: rf"\textbf{{{x}}}", list(endtitle)))
+
     if startcol != 1:
         cells.append(fr"\multicolumn{{{startcol-1}}}{{r|}}{{{title}}}")
-    for weekno in range(startcol, endcol + 1):
+    for weekno in range(startcol, min(endcol, 52 - lastlen) + 1):
         label = r"\textbf{X}" if weekno <= label_until else r"\phantom{\textbf{X}}"
         try:
             color = colors[weekno-1][row-1] if colors else ""
@@ -85,8 +88,10 @@ def build_cells(colors=None,
             color = ""
         cells.append(f"{color}{label}")
 
-    if endcol != 52:
-        cells.append(fr"\multicolumn{{{52-endcol}}}{{|l}}{{}}")
+    if endcol + lastlen < 52:
+        cells.append(fr"\multicolumn{{{52-endcol-lastlen}}}{{|l|}}{{}}")
+
+    cells += lastcols
 
     return cells
 
@@ -181,8 +186,9 @@ contents={{%
             weeks_to_print = birth_week
 
         print("  ", " & ".join(build_cells(row=year, endcol=weeks_to_print, label_until=label_until, colors=colors, endtitle=endtitle)), r" \\", file=args.outfile)
-#        print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
-        print(fr"  \hline", file=args.outfile)
+        print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
+        if weeks_to_print != 52 and endtitle != "":
+            print(fr"  \cline{{{52-len(endtitle)+1}-52}}", file=args.outfile)
 
     # close the table
     print(template_footer, file=args.outfile)
