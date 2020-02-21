@@ -37,6 +37,7 @@ template_header = r"""\documentclass{{article}}
 \usepackage{{pdfpages}}
 \usepackage{{booktabs}}
 \usepackage{{colortbl}}
+\usepackage{{hhline}}
 \usepackage[pages=all]{{background}}
 
 \pagestyle{{empty}}
@@ -161,7 +162,8 @@ contents={{%
     print(fr"  \cline{{{startcol}-52}}", file=args.outfile)
 
     print(" & ".join(build_cells(row=1, title=args.title, startcol=startcol, label_until=header_label_until, colors=colors)), r" \\", file=args.outfile)
-    print(fr"  \cline{{1-52}}", file=args.outfile)
+#    print(fr"  \cline{{1-52}}", file=args.outfile)
+    print(r"  \hhline{*{52}{|-|}}", file=args.outfile)
 
     ## Print the years
     for year in range(2, args.years + 1):
@@ -186,7 +188,8 @@ contents={{%
             weeks_to_print = birth_week
 
         print("  ", " & ".join(build_cells(row=year, endcol=weeks_to_print, label_until=label_until, colors=colors, endtitle=endtitle)), r" \\", file=args.outfile)
-        print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
+#        print(fr"  \cline{{1-{weeks_to_print}}}", file=args.outfile)
+        print(fr"  \hhline{{*{{{weeks_to_print}}}{{|-|}}}}", file=args.outfile)
         if weeks_to_print != 52 and endtitle != "":
             print(fr"  \cline{{{52-len(endtitle)+1}-52}}", file=args.outfile)
 
