@@ -19,7 +19,7 @@ You can tell it how many years to generate (default: 78) and have it `x` off the
 
 To use an image as the background, use the `--background` and `--opacity` flags:
 
-    ./memento.py --background examples/skull.jpg --opacity 0.2 -b 1980-07-04 -y 90 > page.tex
+    ./memento.py --background images/skull.jpg --opacity 0.2 -b 1980-07-04 -y 90 > page.tex
 
 Good opacity values are likely 0.1—0.3, though it will of course depend on what image you are using.
 
@@ -29,4 +29,5 @@ Compile with `pdflatex`:
 
     pdflatex page.tex
 
-This will produce a file, `page.pdf`, which you can print out and hang somewhere prominent.
+This will produce a file, `page.pdf`, which you can print out and hang up.
+Put it somewhere where you'll see it---every day.
