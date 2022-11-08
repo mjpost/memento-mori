@@ -121,11 +121,20 @@ def main(args):
         img = Image.open(args.background)
         width, height = img.size
 
+        ratio_needed = 52 / args.years
+
         # Resize image
-        if width != 52:
-            height = int(img.size[1] / (img.width / 52))
-            print(f"Resizing image from ({width},{img.size[1]}) to (52,{height})", file=sys.stderr)
+        if width / height > ratio_needed:
+            # if it's too wide, fix the width
             width = 52
+            height = int(img.height / (img.width / 52))
+            print(f"Resizing image from ({img.width},{img.height}) to (52,{height})", file=sys.stderr)
+            img = img.resize((width, height))
+        else:
+            # if it's too tall, fix the height
+            height = args.years
+            width = int(img.width / (img.height / args.years))
+            print(f"Resizing image from ({img.width},{img.height}) to ({width},{args.years})", file=sys.stderr)
             img = img.resize((width, height))
 
         # Center the image vertically, padding it with the color in the upper right of the original image (assumed to be the background color)
